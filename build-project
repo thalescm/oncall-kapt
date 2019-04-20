@@ -106,12 +106,14 @@ mkdir -p out/consumer/stubs
 mkdir -p out/consumer/classes
 mkdir -p out/consumer/incremental
 mkdir -p out/consumer/sources
-mkdir -p sample/build/generated
+mkdir -p out/consumer/generated
 
-GENERATED_DIR_MAP="rO0ABXdtAAAAAQAVa2FwdC5rb3RsaW4uZ2VuZXJhdGVkAFAvVXNlcnMvdGhhbGVzbWFjaGFkby9Eb2N1bWVudHMvUHJvamVjdHMvcGVyc29uYWwva2FwdC1jbGkvc2FtcGxlL2J1aWxkL2dlbmVyYXRlZA==" # kapt.kotlin.generated to sample/build/generated
+GENERATED_DIR_MAP="rO0ABXczAAAAAQAVa2FwdC5rb3RsaW4uZ2VuZXJhdGVkABZvdXQvY29uc3VtZXIvZ2VuZXJhdGVk" # kapt.kotlin.generated to out/consumer/generated
 
 info "Starting compiling consumer lib"
 $KOTLIN_HOME/bin/kotlinc \
+$PROJECT_ROOT/consumer/AKotlinClass.kt \
+$PROJECT_ROOT/consumer/KotlinClassWithKotlinAnnotation.kt \
 -d $PROJECT_ROOT/out/consumer \
 -classpath \
 $KOTLIN_HOME/lib/kotlin-stdlib.jar:\
@@ -142,8 +144,6 @@ $PROJECT_ROOT/out/kotlinap/kotlinap.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:useLightAnalysis=true \
 -P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=false \
 -P plugin:org.jetbrains.kotlin.kapt3:verbose=true \
-$PROJECT_ROOT/consumer/AKotlinClass.kt \
-$PROJECT_ROOT/consumer/KotlinClassWithKotlinAnnotation.kt \
 && (cd out/consumer && \
     cp -r classes/* ./ && \
     zip -r consumer META-INF consumer && \

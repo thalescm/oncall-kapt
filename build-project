@@ -44,7 +44,7 @@ $KOTLIN_HOME/lib/kotlin-stdlib.jar \
 -no-reflect \
 -Werror \
 && (cd out/kotlinannotation && \
-    zip -r kotlinannotation META-INF kotlinannotation > /dev/null 2>&1 && \
+    zip -r kotlinannotation META-INF kotlinannotation && \
     mv kotlinannotation.zip kotlinannotation.jar && \
     rm -rf META-INF kotlinannotation/* && \
     rmdir kotlinannotation) \
@@ -55,6 +55,7 @@ mkdir -p out/kotlinap/stubs
 mkdir -p out/kotlinap/classes
 mkdir -p out/kotlinap/incremental
 mkdir -p out/kotlinap/sources
+mkdir -p sample/build/generated
 
 EMPTY_MAP="rO0ABXcEAAAAAA==" # encoded empty map
 
@@ -93,9 +94,9 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=false \
 -P plugin:org.jetbrains.kotlin.kapt3:verbose=true \
 && (cd out/kotlinap && \
-    zip -r kotlinap META-INF kotlinap classes sources > /dev/null 2>&1 && \
+    zip -r kotlinap META-INF kotlinap classes sources && \
     mv kotlinap.zip kotlinap.jar && \
-    rm -rf META-INF classes stubs incremental sources kotlinap/* && \
+    rm -rf META-INF kotlinap/* && \
     rmdir kotlinap) \
 && success "kotlinap lib compilation COMPLETE." || die "kotlinap lib compilation FAILED."
 

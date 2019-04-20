@@ -55,7 +55,6 @@ mkdir -p out/kotlinap/stubs
 mkdir -p out/kotlinap/classes
 mkdir -p out/kotlinap/incremental
 mkdir -p out/kotlinap/sources
-mkdir -p sample/build/generated
 
 EMPTY_MAP="rO0ABXcEAAAAAA==" # encoded empty map
 
@@ -75,7 +74,8 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
 -no-reflect \
 -jvm-target 1.8 \
 -Werror \
--Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing-gradle.jar \
+-Xplugin=$PROJECT_ROOT/libs/tools.jar \
+-Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:aptMode=compile \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-stdlib.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-reflect.jar \
@@ -84,19 +84,20 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-common.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-service.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/guava.jar \
--P plugin:org.jetbrains.kotlin.kapt3:sources=$PROJECT_ROOT/out/kotlinap/tmp/classes/sources \
--P plugin:org.jetbrains.kotlin.kapt3:classes=$PROJECT_ROOT/out/kotlinap/tmp/classes/classes \
--P plugin:org.jetbrains.kotlin.kapt3:incrementalData=$PROJECT_ROOT/out/kotlinap/tmp/classes/incremental \
--P plugin:org.jetbrains.kotlin.kapt3:stubs=$PROJECT_ROOT/out/kotlinap/tmp/stubs \
+-P plugin:org.jetbrains.kotlin.kapt3:sources=$PROJECT_ROOT/out/kotlinap/sources \
+-P plugin:org.jetbrains.kotlin.kapt3:classes=$PROJECT_ROOT/out/kotlinap/classes \
+-P plugin:org.jetbrains.kotlin.kapt3:incrementalData=$PROJECT_ROOT/out/kotlinap/incremental \
+-P plugin:org.jetbrains.kotlin.kapt3:stubs=$PROJECT_ROOT/out/kotlinap/stubs \
 -P plugin:org.jetbrains.kotlin.kapt3:apoptions=$EMPTY_MAP \
 -P plugin:org.jetbrains.kotlin.kapt3:javacArguments=$EMPTY_MAP \
 -P plugin:org.jetbrains.kotlin.kapt3:useLightAnalysis=true \
 -P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=false \
 -P plugin:org.jetbrains.kotlin.kapt3:verbose=true \
 && (cd out/kotlinap && \
-    zip -r kotlinap META-INF kotlinap classes sources && \
+    cp -r classes/* ./ && \
+    zip -r kotlinap META-INF kotlinap && \
     mv kotlinap.zip kotlinap.jar && \
-    rm -rf META-INF kotlinap/* && \
+    rm -rf META-INF classes incremental sources stubs kotlinap/* && \
     rmdir kotlinap) \
 && success "kotlinap lib compilation COMPLETE." || die "kotlinap lib compilation FAILED."
 

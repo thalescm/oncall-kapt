@@ -2,9 +2,6 @@
 
 This simple project aims to test kotlin cli to make kapt to run all phases toghether with compilation by using `aptMode=compile` as an argument to kapt.
 
-Right now this isn't working on the kapt side.
-If you **remove** lines 76 to 93 fron `build-project`, that all works fine (but the kapt won't be run).
-
 
 ## Project structure.
 

@@ -15,6 +15,8 @@ Project is composed of a and annotation class, on `kotlinannotation` folder, and
 
 ## Running
 
+Replace line 4 of `build-project` with your own kotlin home
+
 `./build-project` is all you have to do.
 
 Output will be generated on `out` folder.

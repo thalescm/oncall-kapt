@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 PROJECT_ROOT=${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}
+KOTLIN_HOME=/usr/local/Cellar/kotlin/1.3.21/libexec
 
 red=`tput setab 1 2>/dev/null || true`
 yellow=`tput setab 3 2>/dev/null || true`
@@ -32,11 +33,11 @@ rm -rf out || true
 mkdir -p out/kotlinannotation
 
 info "Starting compiling kotlinannotation"
-kotlin-home/libexec/bin/kotlinc \
+$KOTLIN_HOME/bin/kotlinc \
 $PROJECT_ROOT/kotlinannotation/KotlinAnnotation.kt \
 -d $PROJECT_ROOT/out/kotlinannotation \
 -classpath \
-$PROJECT_ROOT/kotlin-home/libexec/lib/kotlin-stdlib.jar \
+$KOTLIN_HOME/lib/kotlin-stdlib.jar \
 -module-name annotation-lib \
 -jvm-target 1.8 \
 -no-stdlib \
@@ -58,11 +59,11 @@ mkdir -p out/kotlinap/sources
 EMPTY_MAP="rO0ABXcEAAAAAA==" # encoded empty map
 
 info "Starting compiling kotlinap lib"
-kotlin-home/libexec/bin/kotlinc \
+$KOTLIN_HOME/bin/kotlinc \
 $PROJECT_ROOT/kotlinap/AnnotationProcessorKotlin.kt \
 -d $PROJECT_ROOT/out/kotlinap \
 -classpath \
-$PROJECT_ROOT/kotlin-home/libexec/lib/kotlin-stdlib.jar:\
+$KOTLIN_HOME/lib/kotlin-stdlib.jar:\
 $PROJECT_ROOT/out/kotlinannotation/kotlinannotation.jar:\
 $PROJECT_ROOT/libs/auto-common.jar:\
 $PROJECT_ROOT/libs/auto-service.jar:\
@@ -73,11 +74,11 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
 -no-reflect \
 -jvm-target 1.8 \
 -Werror \
--Xplugin=$PROJECT_ROOT/kotlin-home/libexec/lib/kotlin-annotation-processing-gradle.jar \
+-Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing-gradle.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:aptMode=compile \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/kotlin-stdlib.jar \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/kotlin-reflect.jar \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/kotlin-compiler-embeddable.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-stdlib.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-reflect.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-compiler-embeddable.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/trove4j.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-common.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-service.jar \

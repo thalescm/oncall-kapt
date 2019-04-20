@@ -1,0 +1,6 @@
+package consumer
+
+import kotlinannotation.KotlinAnnotation
+
+@KotlinAnnotation
+class KotlinClassWithKotlinAnnotation

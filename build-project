@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROJECT_ROOT=${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}
-KOTLIN_HOME=/usr/local/Cellar/kotlin/1.3.21/libexec
+KOTLIN_HOME=$PROJECT_ROOT/kotlin-home
 
 red=`tput setab 1 2>/dev/null || true`
 yellow=`tput setab 3 2>/dev/null || true`
@@ -64,6 +64,8 @@ $PROJECT_ROOT/kotlinap/AnnotationProcessorKotlin.kt \
 -d $PROJECT_ROOT/out/kotlinap \
 -classpath \
 $KOTLIN_HOME/lib/kotlin-stdlib.jar:\
+$KOTLIN_HOME/lib/kotlin-script-runtime.jar:\
+$KOTLIN_HOME/lib/kotlin-reflect.jar:\
 $PROJECT_ROOT/out/kotlinannotation/kotlinannotation.jar:\
 $PROJECT_ROOT/libs/auto-common.jar:\
 $PROJECT_ROOT/libs/auto-service.jar:\
@@ -72,15 +74,14 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
 -module-name kotlinap-lib \
 -no-stdlib \
 -no-reflect \
--jvm-target 1.8 \
+-Xadd-compiler-builtins \
+-Xload-builtins-from-dependencies \
+-include-runtime \
+-verbose \
 -Werror \
 -Xplugin=$PROJECT_ROOT/libs/tools.jar \
 -Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:aptMode=compile \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-stdlib.jar \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-reflect.jar \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$KOTLIN_HOME/libs/kotlin-compiler-embeddable.jar \
--P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/trove4j.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-common.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/auto-service.jar \
 -P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/guava.jar \
@@ -100,4 +101,54 @@ $PROJECT_ROOT/libs/kotlinpoet.jar \
     rm -rf META-INF classes incremental sources stubs kotlinap/* && \
     rmdir kotlinap) \
 && success "kotlinap lib compilation COMPLETE." || die "kotlinap lib compilation FAILED."
+
+mkdir -p out/consumer/stubs
+mkdir -p out/consumer/classes
+mkdir -p out/consumer/incremental
+mkdir -p out/consumer/sources
+mkdir -p sample/build/generated
+
+GENERATED_DIR_MAP="rO0ABXdtAAAAAQAVa2FwdC5rb3RsaW4uZ2VuZXJhdGVkAFAvVXNlcnMvdGhhbGVzbWFjaGFkby9Eb2N1bWVudHMvUHJvamVjdHMvcGVyc29uYWwva2FwdC1jbGkvc2FtcGxlL2J1aWxkL2dlbmVyYXRlZA==" # kapt.kotlin.generated to sample/build/generated
+
+info "Starting compiling consumer lib"
+$KOTLIN_HOME/bin/kotlinc \
+-d $PROJECT_ROOT/out/consumer \
+-classpath \
+$KOTLIN_HOME/lib/kotlin-stdlib.jar:\
+$KOTLIN_HOME/lib/kotlin-script-runtime.jar:\
+$KOTLIN_HOME/lib/kotlin-reflect.jar:\
+$PROJECT_ROOT/out/kotlinannotation/kotlinannotation.jar:\
+$PROJECT_ROOT/out/kotlinap/kotlinap.jar \
+-module-name consumer-lib \
+-no-stdlib \
+-no-reflect \
+-Xadd-compiler-builtins \
+-Xload-builtins-from-dependencies \
+-include-runtime \
+-verbose \
+-Werror \
+-Xplugin=$PROJECT_ROOT/libs/tools.jar \
+-Xplugin=$KOTLIN_HOME/lib/kotlin-annotation-processing.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:aptMode=compile \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/out/kotlinannotation/kotlinannotation.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/out/kotlinap/kotlinap.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:apclasspath=$PROJECT_ROOT/libs/kotlinpoet.jar \
+-P plugin:org.jetbrains.kotlin.kapt3:sources=$PROJECT_ROOT/out/consumer/sources \
+-P plugin:org.jetbrains.kotlin.kapt3:classes=$PROJECT_ROOT/out/consumer/classes \
+-P plugin:org.jetbrains.kotlin.kapt3:incrementalData=$PROJECT_ROOT/out/consumer/incremental \
+-P plugin:org.jetbrains.kotlin.kapt3:stubs=$PROJECT_ROOT/out/consumer/stubs \
+-P plugin:org.jetbrains.kotlin.kapt3:apoptions=$GENERATED_DIR_MAP \
+-P plugin:org.jetbrains.kotlin.kapt3:javacArguments=$EMPTY_MAP \
+-P plugin:org.jetbrains.kotlin.kapt3:useLightAnalysis=true \
+-P plugin:org.jetbrains.kotlin.kapt3:correctErrorTypes=false \
+-P plugin:org.jetbrains.kotlin.kapt3:verbose=true \
+$PROJECT_ROOT/consumer/AKotlinClass.kt \
+$PROJECT_ROOT/consumer/KotlinClassWithKotlinAnnotation.kt \
+&& (cd out/consumer && \
+    cp -r classes/* ./ && \
+    zip -r consumer META-INF consumer && \
+    mv consumer.zip consumer.jar && \
+    rm -rf META-INF classes incremental sources stubs consumer/* && \
+    rmdir consumer) \
+&& success "consumer lib compilation COMPLETE." || die "consumer lib compilation FAILED."
 
